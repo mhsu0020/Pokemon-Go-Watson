@@ -1,0 +1,57 @@
+[  
+   {
+      "id":"9944efea.cb2dd",
+      "type":"websocket-listener",
+      "z":"a8708e92.1d69d",
+      "name":"pokemon",
+      "path":"/ws/pokemon",
+      "wholemsg":"false"
+   },
+   {
+      "id":"1164e94e.25abc7",
+      "type":"websocket in",
+      "z":"a8708e92.1d69d",
+      "name":"pokemon in",
+      "server":"9944efea.cb2dd",
+      "client":"",
+      "x":79.61250305175781,
+      "y":185.99999618530273,
+      "wires":[
+         [
+            "9941db3b.b4b8d8"
+         ]
+      ]
+   },
+   {
+      "id":"12120526.67b9fb",
+      "type":"websocket out",
+      "z":"a8708e92.1d69d",
+      "name":"pokemon out",
+      "server":"9944efea.cb2dd",
+      "client":"",
+      "x":570.6125030517578,
+      "y":185.19999313354492,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"9941db3b.b4b8d8",
+      "type":"function",
+      "z":"a8708e92.1d69d",
+      "name":"clean session",
+      "func":"msg.query={}\nmsg._session=null\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "dependencies":[
+
+      ],
+      "x":316.6125793457031,
+      "y":184.79999923706055,
+      "wires":[
+         [
+            "12120526.67b9fb"
+         ]
+      ]
+   }
+]
