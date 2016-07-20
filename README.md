@@ -20,6 +20,6 @@ The Pokemon Go Watson Alerter periodically creates screenshots of the foreground
 6. Start the Pokemon Go Watson Alerter, then change the foreground app to Pokemon Go. If  ENABLE_WEBSOCKET_OUTPUT is true, client apps connected to the endpoint should start seeing output.
 
 ## Future Work
-Create an android app that allows users to classify screenshots and upload the image/classification to the classifier, allowing crowdsourcing of training.
+Add functionality that allows users to classify screenshots and upload the image/classification to the classifier, allowing crowdsourcing of training.
 
 NOTE: Android classifier alert app based on fork from [https://github.com/mtsahakis/MediaProjectionDemo](https://github.com/mtsahakis/MediaProjectionDemo)
