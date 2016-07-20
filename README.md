@@ -9,6 +9,6 @@ Started during AT&T Shape Hackathon 2016.
 
 3. Update Config.java with your configs
 
-4. (optional) Set up a Websocket Server using [Node-RED](https://developer.ibm.com/recipes/tutorials/creating-a-nodered-application-on-bluemix/) or [AT&T Flow Designer](https://flow.att.io) and create flow using WebsocketNodeRED/flow.json.  
+4. (optional) Set up a Websocket Server using (Node-RED)[https://developer.ibm.com/recipes/tutorials/creating-a-nodered-application-on-bluemix/] or (AT&T Flow Designer)[https://flow.att.io] and create flow using WebsocketNodeRED/flow.json.  
 
 NOTE: Android classifier alert app based on fork from (https://github.com/mtsahakis/MediaProjectionDemo)[https://github.com/mtsahakis/MediaProjectionDemo]
