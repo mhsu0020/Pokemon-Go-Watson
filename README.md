@@ -5,7 +5,7 @@ Started during AT&T Shape Hackathon 2016. Winner of Watson API Challenge.
 
 [IBM Blog Post](https://www.ibm.com/blogs/internet-of-things/pokemon-go-watson/)
 
-The Pokemon Go Watson Alerter periodically creates screenshots of the foreground app, classifies the image with a pre-trained Watson Visual Recognition classifier, then outputs the class names to a WebSocket endpoint.
+The Pokemon Go Watson Alerter periodically creates screenshots of the foreground app, classifies the image with a pre-trained Watson Visual Recognition classifier, then outputs the class names to a WebSocket endpoint. Imagine a real life IoT enabled Poke-Stop that alerts users nearby of rare Pokemon!  
 
 1. Create a Bluemix account and create a Visual Recognition Service
 
