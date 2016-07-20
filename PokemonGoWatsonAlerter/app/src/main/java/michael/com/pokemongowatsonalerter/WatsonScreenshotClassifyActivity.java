@@ -1,7 +1,10 @@
 package michael.com.pokemongowatsonalerter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -40,11 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * Heavily borrowed from https://github.com/mtsahakis/MediaProjectionDemo
- *
- *
- * */
+ */
 public class WatsonScreenshotClassifyActivity extends Activity {
 
     private static final String TAG = WatsonScreenshotClassifyActivity.class.getName();
@@ -104,18 +104,18 @@ public class WatsonScreenshotClassifyActivity extends Activity {
                             .classifierIds(new ArrayList<String>()).classifierIds(Config.WATSON_POKEMON_CLASSIFIER_ID)
                             .build();
                     VisualClassification result = service.classify(options).execute();
-                    Log.e(TAG, "result for " + imageFileName+":\n"+result.toString());
+                    Log.e(TAG, "result for " + imageFileName + ":\n" + result.toString());
 
                     //Handle cases where classifier can return null
-                    if(result.getImages() != null){
+                    if (result.getImages() != null) {
                         List<VisualClassifier> resultClasses = result.getImages().get(0).getClassifiers();
-                        if(resultClasses.size() > 0){
+                        if (resultClasses.size() > 0) {
                             VisualClassifier classifier = resultClasses.get(0);
                             List<VisualClassifier.VisualClass> classList = classifier.getClasses();
-                            if(classList.size() > 0){
+                            if (classList.size() > 0) {
                                 final String className = classList.get(0).getName();
                                 Log.e(TAG, "classifier name: " + className);
-                                if(Config.ENABLE_WEBSOCKET_OUTPUT){
+                                if (Config.ENABLE_WEBSOCKET_OUTPUT) {
                                     AsyncHttpClient.getDefaultInstance().websocket(Config.WEBSOCKET_OUTPUT_URL, "my-protocol", new AsyncHttpClient.WebSocketConnectCallback() {
                                         @Override
                                         public void onCompleted(Exception ex, WebSocket webSocket) {
@@ -139,7 +139,7 @@ public class WatsonScreenshotClassifyActivity extends Activity {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                if (fos!=null) {
+                if (fos != null) {
                     try {
                         fos.close();
                     } catch (IOException ioe) {
@@ -147,11 +147,11 @@ public class WatsonScreenshotClassifyActivity extends Activity {
                     }
                 }
 
-                if (bitmap!=null) {
+                if (bitmap != null) {
                     bitmap.recycle();
                 }
 
-                if (image!=null) {
+                if (image != null) {
                     image.close();
                 }
             }
@@ -171,8 +171,9 @@ public class WatsonScreenshotClassifyActivity extends Activity {
                     mRotation = rotation;
                     try {
                         // clean up
-                        if(mVirtualDisplay != null) mVirtualDisplay.release();
-                        if(mImageReader != null) mImageReader.setOnImageAvailableListener(null, null);
+                        if (mVirtualDisplay != null) mVirtualDisplay.release();
+                        if (mImageReader != null)
+                            mImageReader.setOnImageAvailableListener(null, null);
 
                         // re-create virtual display depending on device width / height
                         createVirtualDisplay();
@@ -191,16 +192,18 @@ public class WatsonScreenshotClassifyActivity extends Activity {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if(mVirtualDisplay != null) mVirtualDisplay.release();
-                    if(mImageReader != null) mImageReader.setOnImageAvailableListener(null, null);
-                    if(mOrientationChangeCallback != null) mOrientationChangeCallback.disable();
+                    if (mVirtualDisplay != null) mVirtualDisplay.release();
+                    if (mImageReader != null) mImageReader.setOnImageAvailableListener(null, null);
+                    if (mOrientationChangeCallback != null) mOrientationChangeCallback.disable();
                     sMediaProjection.unregisterCallback(MediaProjectionStopCallback.this);
                 }
             });
         }
     }
 
-    /****************************************** Activity Lifecycle methods ************************/
+    /******************************************
+     * Activity Lifecycle methods
+     ************************/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -211,7 +214,7 @@ public class WatsonScreenshotClassifyActivity extends Activity {
         mProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
 
         // start projection
-        Button startButton = (Button)findViewById(R.id.startButton);
+        Button startButton = (Button) findViewById(R.id.startButton);
         startButton.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -221,12 +224,22 @@ public class WatsonScreenshotClassifyActivity extends Activity {
         });
 
         // stop projection
-        Button stopButton = (Button)findViewById(R.id.stopButton);
+        Button stopButton = (Button) findViewById(R.id.stopButton);
         stopButton.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 stopProjection();
+            }
+        });
+
+        //Delete Screenshots
+        Button deleteButton = (Button) findViewById(R.id.deleteButton);
+        deleteButton.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                deleteScreenshots();
             }
         });
 
@@ -283,7 +296,9 @@ public class WatsonScreenshotClassifyActivity extends Activity {
         }
     }
 
-    /****************************************** UI Widget Callbacks *******************************/
+    /******************************************
+     * UI Widget Callbacks
+     *******************************/
     private void startProjection() {
         startActivityForResult(mProjectionManager.createScreenCaptureIntent(), REQUEST_CODE);
     }
@@ -299,7 +314,54 @@ public class WatsonScreenshotClassifyActivity extends Activity {
         });
     }
 
-    /****************************************** Factoring Virtual Display creation ****************/
+    private void deleteScreenshots() {
+
+        File externalFilesDir = getExternalFilesDir(null);
+        int fileCount = 0;
+        if (externalFilesDir != null) {
+            STORE_DIRECTORY = externalFilesDir.getAbsolutePath() + "/screenshots/";
+            final File storeDirectory = new File(STORE_DIRECTORY);
+            if (storeDirectory.exists()) {
+                fileCount = storeDirectory.listFiles().length;
+                if (fileCount != 0) {
+
+                    new AlertDialog.Builder(this)
+                            .setMessage("Are you sure you want to delete all " + fileCount + " screenshots?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    for (File file : storeDirectory.listFiles())
+                                        if (!file.isDirectory())
+                                            file.delete();
+                                }
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+
+                } else {
+                    new AlertDialog.Builder(this)
+                            .setMessage("No screenshots in directory.")
+                            .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+
+                }
+
+            } else {
+                return;
+            }
+        } else {
+            return;
+        }
+
+    }
+
+    /******************************************
+     * Factoring Virtual Display creation
+     ****************/
     private void createVirtualDisplay() {
         // get width and height
         Point size = new Point();
